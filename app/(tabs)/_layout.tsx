@@ -25,6 +25,14 @@ type VectorIconFamily = {
   ) => Promise<ImageSourcePropType>
 }
 
+const iconLabelColor = (inactiveTintColor: string) =>
+  Platform.OS === "ios" && isLiquidGlassAvailable()
+    ? DynamicColorIOS({
+        light: theme.colorBlack,
+        dark: theme.colorWhite,
+      })
+    : inactiveTintColor
+
 export default function TabLayout() {
   const tintColor = useThemeColor(theme.color.reactBlue, "tint")
   const inactiveTintColor = useThemeColor(
@@ -39,29 +47,16 @@ export default function TabLayout() {
     <NativeTabs
       badgeBackgroundColor={tintColor}
       labelStyle={{
-        color:
-          Platform.OS === "ios" && isLiquidGlassAvailable()
-            ? DynamicColorIOS({
-                light: theme.colorBlack,
-                dark: theme.colorWhite,
-              })
-            : inactiveTintColor,
+        color: iconLabelColor(inactiveTintColor),
       }}
-      iconColor={
-        Platform.OS === "ios" && isLiquidGlassAvailable()
-          ? DynamicColorIOS({
-              light: theme.colorBlack,
-              dark: theme.colorWhite,
-            })
-          : inactiveTintColor
-      }
+      iconColor={iconLabelColor(inactiveTintColor)}
       tintColor={
         Platform.OS === "ios"
           ? DynamicColorIOS(theme.color.reactBlue)
           : inactiveTintColor
       }
     >
-      <NativeTabs.Trigger name="recipes">
+      <NativeTabs.Trigger name="(recipes)">
         <Label>Recipes</Label>
         {Platform.select({
           ios: <Icon sf="book.fill" />,
