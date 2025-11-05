@@ -8,8 +8,8 @@ import {
 } from "expo-router/unstable-native-tabs"
 import React from "react"
 
-import { useThemeColor } from "@/hooks/use-theme-color"
-import { theme } from "@/theme"
+import { theme } from "@/constants/theme"
+import { useThemeColor } from "@/hooks/UseThemeColor"
 import {
   ColorValue,
   DynamicColorIOS,
@@ -34,14 +34,11 @@ const iconLabelColor = (inactiveTintColor: string) =>
     : inactiveTintColor
 
 export default function TabLayout() {
-  const tintColor = useThemeColor(theme.color.reactBlue, "tint")
-  const inactiveTintColor = useThemeColor(
-    {
-      light: "#00000090",
-      dark: "#FFFFFF90",
-    },
-    "tint",
-  )
+  const tintColor = useThemeColor(theme.color.reactBlue)
+  const inactiveTintColor = useThemeColor({
+    light: "#00000090",
+    dark: "#FFFFFF90",
+  })
 
   return (
     <NativeTabs

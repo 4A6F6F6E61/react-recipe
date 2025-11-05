@@ -1,4 +1,4 @@
-import { HeaderButton } from "@/components/HeaderButtons/HeaderButton"
+import { HeaderButton } from "@/components/header-buttons/header-button"
 import { isLiquidGlassAvailable } from "expo-glass-effect"
 import { Stack } from "expo-router"
 import { useColorScheme } from "react-native"

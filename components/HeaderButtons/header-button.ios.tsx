@@ -1,4 +1,4 @@
-import { theme } from "@/theme"
+import { theme } from "@/constants/theme"
 import { Button, ButtonProps, Host, Image, ImageProps } from "@expo/ui/swift-ui"
 import { frame } from "@expo/ui/swift-ui/modifiers"
 import { StyleProp, ViewStyle } from "react-native"

@@ -1,4 +1,4 @@
-import { theme } from "@/theme"
+import { theme } from "@/constants/theme"
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons"
 import { Pressable } from "react-native-gesture-handler"
 import Animated, {
@@ -6,7 +6,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
-import { HeaderButtonProps } from "./HeaderButton.ios"
+import { HeaderButtonProps } from "./header-button.ios"
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 
