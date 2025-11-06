@@ -53,6 +53,23 @@ export default function TabLayout() {
           : inactiveTintColor
       }
     >
+      <NativeTabs.Trigger name="(home)">
+        <Label>Home</Label>
+        {Platform.select({
+          ios: <Icon sf="house" />,
+          android: (
+            <Icon
+              src={
+                <VectorIcon
+                  family={MaterialCommunityIcons as VectorIconFamily}
+                  name="house"
+                />
+              }
+              selectedColor={tintColor}
+            />
+          ),
+        })}
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="(recipes)">
         <Label>Recipes</Label>
         {Platform.select({
@@ -70,7 +87,7 @@ export default function TabLayout() {
           ),
         })}
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="ingredients">
+      <NativeTabs.Trigger name="(ingredients)">
         <Label>Ingredients</Label>
         {Platform.select({
           ios: <Icon sf="basket.fill" />,
@@ -87,7 +104,10 @@ export default function TabLayout() {
           ),
         })}
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="settings">
+      <NativeTabs.Trigger
+        name="(settings)"
+        role={isLiquidGlassAvailable() ? "search" : undefined}
+      >
         <Label>Settings</Label>
         {Platform.select({
           ios: <Icon sf="gear" />,

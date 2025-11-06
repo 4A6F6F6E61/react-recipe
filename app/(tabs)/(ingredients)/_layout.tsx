@@ -2,12 +2,12 @@ import { HeaderButton } from "@/components/header/header-button"
 import { useIndexScreenOptions } from "@/hooks/use-index-screen-options"
 import { Stack } from "expo-router"
 
-const RecipesLayout = () => {
+const IngredientsLayout = () => {
   return (
     <Stack>
       <Stack.Screen
         name="index"
-        options={useIndexScreenOptions("Recipes", () => (
+        options={useIndexScreenOptions("Ingredients", () => (
           <HeaderButton imageProps={{ systemName: "plus" }} />
         ))}
       />
@@ -15,4 +15,4 @@ const RecipesLayout = () => {
   )
 }
 
-export default RecipesLayout
+export default IngredientsLayout

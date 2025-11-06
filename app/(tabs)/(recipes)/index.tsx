@@ -1,11 +1,13 @@
-import { StyleSheet, View } from "react-native"
-
-import { ThemedText } from "@/components/themed-text"
+import { StyleSheet, View, Text } from "react-native"
+import { useThemeColor } from "@/hooks/UseThemeColor"
+import { theme } from "@/constants/theme"
 
 const RecipesScreen = () => {
   return (
     <View style={styles.container}>
-      <ThemedText style={styles.text}>Home screen</ThemedText>
+      <Text style={{ color: useThemeColor(theme.color.text) }}>
+        Recipes Screen
+      </Text>
     </View>
   )
 }
@@ -15,9 +17,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-  },
-  text: {
-    color: "#fff",
   },
 })
 
