@@ -6,7 +6,6 @@ import {
   ThemeProvider,
 } from "@react-navigation/native"
 import { ConvexReactClient } from "convex/react"
-import { isLiquidGlassAvailable } from "expo-glass-effect"
 import { Stack } from "expo-router"
 import * as SecureStore from "expo-secure-store"
 import { StatusBar } from "expo-status-bar"
@@ -43,13 +42,6 @@ export default function RootLayout() {
       >
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="modal"
-            options={{
-              presentation: isLiquidGlassAvailable() ? "formSheet" : "modal",
-              title: "Modal",
-            }}
-          />
         </Stack>
         <StatusBar style="auto" />
       </ConvexAuthProvider>

@@ -10,12 +10,14 @@ import React from "react"
 
 import { theme } from "@/constants/theme"
 import { useThemeColor } from "@/hooks/UseThemeColor"
+import { Authenticated, Unauthenticated } from "convex/react"
 import {
   ColorValue,
   DynamicColorIOS,
   ImageSourcePropType,
   Platform,
 } from "react-native"
+import AuthPage from "./auth"
 
 type VectorIconFamily = {
   getImageSource: (
@@ -41,89 +43,96 @@ export default function TabLayout() {
   })
 
   return (
-    <NativeTabs
-      badgeBackgroundColor={tintColor}
-      labelStyle={{
-        color: iconLabelColor(inactiveTintColor),
-      }}
-      iconColor={iconLabelColor(inactiveTintColor)}
-      tintColor={
-        Platform.OS === "ios"
-          ? DynamicColorIOS(theme.color.reactBlue)
-          : inactiveTintColor
-      }
-    >
-      <NativeTabs.Trigger name="(home)">
-        <Label>Home</Label>
-        {Platform.select({
-          ios: <Icon sf="house" />,
-          android: (
-            <Icon
-              src={
-                <VectorIcon
-                  family={MaterialCommunityIcons as VectorIconFamily}
-                  name="house"
+    <>
+      <Unauthenticated>
+        <AuthPage />
+      </Unauthenticated>
+      <Authenticated>
+        <NativeTabs
+          badgeBackgroundColor={tintColor}
+          labelStyle={{
+            color: iconLabelColor(inactiveTintColor),
+          }}
+          iconColor={iconLabelColor(inactiveTintColor)}
+          tintColor={
+            Platform.OS === "ios"
+              ? DynamicColorIOS(theme.color.reactBlue)
+              : inactiveTintColor
+          }
+        >
+          <NativeTabs.Trigger name="(home)">
+            <Label>Home</Label>
+            {Platform.select({
+              ios: <Icon sf="house.fill" />,
+              android: (
+                <Icon
+                  src={
+                    <VectorIcon
+                      family={MaterialCommunityIcons as VectorIconFamily}
+                      name="house"
+                    />
+                  }
+                  selectedColor={tintColor}
                 />
-              }
-              selectedColor={tintColor}
-            />
-          ),
-        })}
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="(recipes)">
-        <Label>Recipes</Label>
-        {Platform.select({
-          ios: <Icon sf="book.fill" />,
-          android: (
-            <Icon
-              src={
-                <VectorIcon
-                  family={MaterialCommunityIcons as VectorIconFamily}
-                  name="book"
+              ),
+            })}
+          </NativeTabs.Trigger>
+          <NativeTabs.Trigger name="(recipes)">
+            <Label>Recipes</Label>
+            {Platform.select({
+              ios: <Icon sf="book.fill" />,
+              android: (
+                <Icon
+                  src={
+                    <VectorIcon
+                      family={MaterialCommunityIcons as VectorIconFamily}
+                      name="book"
+                    />
+                  }
+                  selectedColor={tintColor}
                 />
-              }
-              selectedColor={tintColor}
-            />
-          ),
-        })}
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="(ingredients)">
-        <Label>Ingredients</Label>
-        {Platform.select({
-          ios: <Icon sf="basket.fill" />,
-          android: (
-            <Icon
-              src={
-                <VectorIcon
-                  family={MaterialCommunityIcons as VectorIconFamily}
-                  name="basket"
+              ),
+            })}
+          </NativeTabs.Trigger>
+          <NativeTabs.Trigger name="(ingredients)">
+            <Label>Ingredients</Label>
+            {Platform.select({
+              ios: <Icon sf="basket.fill" />,
+              android: (
+                <Icon
+                  src={
+                    <VectorIcon
+                      family={MaterialCommunityIcons as VectorIconFamily}
+                      name="basket"
+                    />
+                  }
+                  selectedColor={tintColor}
                 />
-              }
-              selectedColor={tintColor}
-            />
-          ),
-        })}
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger
-        name="(settings)"
-        role={isLiquidGlassAvailable() ? "search" : undefined}
-      >
-        <Label>Settings</Label>
-        {Platform.select({
-          ios: <Icon sf="gear" />,
-          android: (
-            <Icon
-              src={
-                <VectorIcon
-                  family={MaterialCommunityIcons as VectorIconFamily}
-                  name="cog"
+              ),
+            })}
+          </NativeTabs.Trigger>
+          <NativeTabs.Trigger
+            name="(settings)"
+            role={isLiquidGlassAvailable() ? "search" : undefined}
+          >
+            <Label>Settings</Label>
+            {Platform.select({
+              ios: <Icon sf="gear" />,
+              android: (
+                <Icon
+                  src={
+                    <VectorIcon
+                      family={MaterialCommunityIcons as VectorIconFamily}
+                      name="cog"
+                    />
+                  }
+                  selectedColor={tintColor}
                 />
-              }
-              selectedColor={tintColor}
-            />
-          ),
-        })}
-      </NativeTabs.Trigger>
-    </NativeTabs>
+              ),
+            })}
+          </NativeTabs.Trigger>
+        </NativeTabs>
+      </Authenticated>
+    </>
   )
 }

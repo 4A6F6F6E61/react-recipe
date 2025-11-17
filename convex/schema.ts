@@ -1,6 +1,6 @@
-import { authTables } from "@convex-dev/auth/server";
-import { defineSchema, defineTable } from "convex/server";
-import { v } from "convex/values";
+import { authTables } from "@convex-dev/auth/server"
+import { defineSchema, defineTable } from "convex/server"
+import { v } from "convex/values"
 
 export default defineSchema({
   ...authTables,
@@ -14,7 +14,7 @@ export default defineSchema({
     protein: v.number(),
     carbs: v.number(),
     fat: v.number(),
-    fiber: v.optional(v.number()),
+    fiber: v.number(),
     /* ------------------------------- */
     image: v.optional(v.string()),
     createdBy: v.id("users"),
@@ -52,4 +52,4 @@ export default defineSchema({
   })
     .index("by_recipe", ["recipeId"])
     .index("by_step", ["recipeId", "stepNumber"]),
-});
+})
