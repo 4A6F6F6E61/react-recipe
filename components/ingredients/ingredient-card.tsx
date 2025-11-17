@@ -2,7 +2,7 @@ import { theme } from "@/constants/theme"
 import type { Doc } from "@/convex/_generated/dataModel"
 import { useThemeColor } from "@/hooks/UseThemeColor"
 import { memo, useMemo } from "react"
-import { StyleSheet, Text, View } from "react-native"
+import { Image, StyleSheet, Text, View } from "react-native"
 
 const MACRO_COLORS = {
   protein: "#4C6EF5",
@@ -11,7 +11,9 @@ const MACRO_COLORS = {
   fiber: "#12B886",
 } as const
 
-type IngredientDoc = Doc<"ingredients">
+type IngredientDoc = Doc<"ingredients"> & {
+  imageUrl: string
+}
 
 interface IngredientCardProps {
   ingredient: IngredientDoc
@@ -64,41 +66,51 @@ const IngredientCard = memo(({ ingredient }: IngredientCardProps) => {
   return (
     <View style={[styles.wrapper, styles.shadow]}>
       <View style={[styles.card, { backgroundColor, borderColor }]}>
-        <Text style={[styles.title, { color: textColor }]}>
-          {ingredient.name}
-        </Text>
-        <Text style={[styles.subtitle, { color: secondaryText }]}>
-          {ingredient.calories} kcal
-        </Text>
-        <View style={styles.barRow}>
-          {macros.map(macro => {
-            const percent =
-              totalMacros === 0 ? 0 : (macro.grams / totalMacros) * 100
-            const widthPct = macro.grams === 0 ? 0 : Math.max(percent, 8)
-            return (
-              <View key={macro.key} style={styles.barColumn}>
-                <View
-                  style={[
-                    styles.barTrack,
-                    { backgroundColor: trackColor, borderColor },
-                  ]}
-                >
+        <Image
+          source={{ uri: ingredient.imageUrl }}
+          style={styles.image}
+          resizeMode="cover"
+        />
+        <View style={{ flex: 4 }}>
+          <Text style={[styles.title, { color: textColor }]}>
+            {ingredient.name}
+          </Text>
+          <Text style={[styles.subtitle, { color: secondaryText }]}>
+            {ingredient.calories} kcal
+          </Text>
+          <View style={styles.barRow}>
+            {macros.map(macro => {
+              const percent =
+                totalMacros === 0 ? 0 : (macro.grams / totalMacros) * 100
+              const widthPct = macro.grams === 0 ? 0 : Math.max(percent, 8)
+              return (
+                <View key={macro.key} style={styles.barColumn}>
                   <View
                     style={[
-                      styles.barFill,
-                      { width: `${widthPct}%`, backgroundColor: macro.color },
+                      styles.barTrack,
+                      { backgroundColor: trackColor, borderColor },
                     ]}
-                  />
+                  >
+                    <View
+                      style={[
+                        styles.barFill,
+                        {
+                          width: `${widthPct}%`,
+                          backgroundColor: macro.color,
+                        },
+                      ]}
+                    />
+                  </View>
+                  <Text style={[styles.barLabel, { color: textColor }]}>
+                    {macro.label}
+                  </Text>
+                  <Text style={[styles.barValue, { color: secondaryText }]}>
+                    {macro.grams} g
+                  </Text>
                 </View>
-                <Text style={[styles.barLabel, { color: textColor }]}>
-                  {macro.label}
-                </Text>
-                <Text style={[styles.barValue, { color: secondaryText }]}>
-                  {macro.grams} g
-                </Text>
-              </View>
-            )
-          })}
+              )
+            })}
+          </View>
         </View>
       </View>
     </View>
@@ -117,8 +129,15 @@ export const styles = StyleSheet.create({
   card: {
     width: "100%",
     borderRadius: theme.borderRadius20,
-    padding: theme.space16,
     borderWidth: 1,
+    padding: theme.space16,
+    flexDirection: "row",
+    gap: theme.space16,
+  },
+  image: {
+    flex: 3,
+    height: 125,
+    borderRadius: theme.borderRadius12,
   },
   shadow: {
     shadowColor: "#000",

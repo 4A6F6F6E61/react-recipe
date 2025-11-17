@@ -16,7 +16,7 @@ export default defineSchema({
     fat: v.number(),
     fiber: v.number(),
     /* ------------------------------- */
-    image: v.optional(v.string()),
+    image: v.id("_storage"),
     createdBy: v.id("users"),
     createdAt: v.number(),
   })

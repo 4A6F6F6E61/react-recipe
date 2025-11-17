@@ -18,6 +18,7 @@ import {
   Text,
   View,
 } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 type MacroFieldKey = "protein" | "carbs" | "fat" | "fiber"
 
@@ -47,11 +48,13 @@ const initialFormState: FormState = {
 }
 
 export default function AddIngredientModal() {
+  const generateUploadUrl = useMutation(api.ingredients.generateUploadUrl)
+
   const [form, setForm] = useState<FormState>(initialFormState)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [imageUri, setImageUri] = useState<string | null>(null)
-  const backgroundColor = useThemeColor(theme.color.background)
+
   const borderColor = useThemeColor(theme.color.border)
   const textColor = useThemeColor(theme.color.text)
   const secondaryText = useThemeColor(theme.color.textSecondary)
@@ -74,10 +77,10 @@ export default function AddIngredientModal() {
       mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 0.8,
+      quality: 0.1,
     })
 
-    if (!result.canceled && result.assets[0]) {
+    if (!result.canceled && result.assets[0] && result.assets[0].uri) {
       setImageUri(result.assets[0].uri)
     }
   }, [])
@@ -88,6 +91,7 @@ export default function AddIngredientModal() {
   }, [])
 
   const handleSubmit = useCallback(async () => {
+    console.log("Submitting form:", form)
     setError(null)
     const trimmedName = form.name.trim()
     if (!trimmedName) {
@@ -101,33 +105,37 @@ export default function AddIngredientModal() {
       return
     }
 
-    const payload = {
-      name: trimmedName,
-      calories: Math.round(calories),
-      protein: parseNumber(form.protein),
-      carbs: parseNumber(form.carbs),
-      fat: parseNumber(form.fat),
-      fiber: parseNumber(form.fiber),
-      image: imageUri || undefined,
-    }
-
-    if (
-      [payload.protein, payload.carbs, payload.fat, payload.fiber].some(
-        Number.isNaN,
-      )
-    ) {
-      setError("Macros must be numeric values.")
-      return
-    }
-
     setIsSubmitting(true)
     try {
-      await createIngredient(payload)
+      const selectedImage = imageUri
+        ? await (await fetch(imageUri)).blob()
+        : null
+      if (!selectedImage) {
+        throw new Error("Unable to process the selected image.")
+      }
+      const uploadUrl = await generateUploadUrl()
+
+      const result = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": selectedImage!.type },
+        body: selectedImage,
+      })
+      const { storageId } = await result.json()
+
+      await createIngredient({
+        name: trimmedName,
+        calories: Math.round(calories),
+        protein: parseNumber(form.protein),
+        carbs: parseNumber(form.carbs),
+        fat: parseNumber(form.fat),
+        fiber: parseNumber(form.fiber),
+        storageId,
+      })
       await resetForm()
       router.back()
       Alert.alert(
         "Ingredient saved",
-        `${payload.name} was added to your pantry.`,
+        `${trimmedName} was added to your pantry.`,
       )
     } catch (mutationError) {
       console.error(mutationError)
@@ -138,95 +146,109 @@ export default function AddIngredientModal() {
     } finally {
       setIsSubmitting(false)
     }
-  }, [createIngredient, form, parseNumber, resetForm, imageUri])
+  }, [
+    createIngredient,
+    form,
+    generateUploadUrl,
+    imageUri,
+    parseNumber,
+    resetForm,
+  ])
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={[styles.flex, { backgroundColor }]}
-    >
-      <ScrollView
-        contentContainerStyle={styles.formContent}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: textColor }]}>
-            Add Ingredient
-          </Text>
-          <Text style={[styles.subtitle, { color: secondaryText }]}>
-            Track your ingredients with detailed nutritional info
-          </Text>
-        </View>
-
-        {/* Image upload section */}
-        <View
-          style={[
-            styles.imageSection,
-            { backgroundColor: cardColor, borderColor },
-          ]}
+        <ScrollView
+          contentContainerStyle={styles.formContent}
+          keyboardShouldPersistTaps="handled"
         >
-          {imageUri ? (
-            <Pressable onPress={pickImage} style={styles.imagePreview}>
-              <Image source={{ uri: imageUri }} style={styles.imageThumbnail} />
-              <Text style={[styles.imageLabel, { color: secondaryText }]}>
-                Tap to change
-              </Text>
-            </Pressable>
-          ) : (
-            <Pressable
-              onPress={pickImage}
-              style={[styles.imagePlaceholder, { borderColor }]}
-            >
-              <Text
-                style={[styles.imagePlaceholderText, { color: secondaryText }]}
+          <View style={styles.header}>
+            <Text style={[styles.title, { color: textColor }]}>
+              Add Ingredient
+            </Text>
+            <Text style={[styles.subtitle, { color: secondaryText }]}>
+              Track your ingredients with detailed nutritional info
+            </Text>
+          </View>
+
+          {/* Image upload section */}
+          <View
+            style={[
+              styles.imageSection,
+              { backgroundColor: cardColor, borderColor },
+            ]}
+          >
+            {imageUri ? (
+              <Pressable onPress={pickImage} style={styles.imagePreview}>
+                <Image
+                  source={{ uri: imageUri }}
+                  style={styles.imageThumbnail}
+                />
+                <Text style={[styles.imageLabel, { color: secondaryText }]}>
+                  Tap to change
+                </Text>
+              </Pressable>
+            ) : (
+              <Pressable
+                onPress={pickImage}
+                style={[styles.imagePlaceholder, { borderColor }]}
               >
-                📷 Add photo
-              </Text>
-            </Pressable>
-          )}
-        </View>
+                <Text
+                  style={[
+                    styles.imagePlaceholderText,
+                    { color: secondaryText },
+                  ]}
+                >
+                  📷 Add photo
+                </Text>
+              </Pressable>
+            )}
+          </View>
 
-        <Text style={[styles.sectionLabel, { color: textColor }]}>
-          Basic info
-        </Text>
-        <TextField
-          placeholder="Ingredient name"
-          value={form.name}
-          onChangeText={text => updateField("name", text)}
-        />
-        <TextField
-          placeholder="Calories (per 100g)"
-          keyboardType="decimal-pad"
-          value={form.calories}
-          onChangeText={text => updateField("calories", text)}
-        />
-
-        <Text style={[styles.sectionLabel, { color: textColor }]}>
-          Macros (per 100g)
-        </Text>
-        {macroFields.map(field => (
+          <Text style={[styles.sectionLabel, { color: textColor }]}>
+            Basic info
+          </Text>
           <TextField
-            key={field.key}
-            placeholder={field.label}
-            keyboardType="decimal-pad"
-            value={form[field.key]}
-            onChangeText={text => updateField(field.key, text)}
+            placeholder="Ingredient name"
+            value={form.name}
+            onChangeText={text => updateField("name", text)}
           />
-        ))}
+          <TextField
+            placeholder="Calories (per 100g)"
+            keyboardType="decimal-pad"
+            value={form.calories}
+            onChangeText={text => updateField("calories", text)}
+          />
 
-        <Text style={[styles.helperText, { color: secondaryText }]}>
-          All values in grams except calories. Fiber is optional.
-        </Text>
+          <Text style={[styles.sectionLabel, { color: textColor }]}>
+            Macros (per 100g)
+          </Text>
+          {macroFields.map(field => (
+            <TextField
+              key={field.key}
+              placeholder={field.label}
+              keyboardType="decimal-pad"
+              value={form[field.key]}
+              onChangeText={text => updateField(field.key, text)}
+            />
+          ))}
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+          <Text style={[styles.helperText, { color: secondaryText }]}>
+            All values in grams except calories. Fiber is optional.
+          </Text>
 
-        <PlatformButton
-          title={isSubmitting ? "Saving…" : "Save ingredient"}
-          onPress={handleSubmit}
-          disabled={isSubmitting}
-        />
-      </ScrollView>
-    </KeyboardAvoidingView>
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          <PlatformButton
+            title={isSubmitting ? "Saving…" : "Save ingredient"}
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   )
 }
 

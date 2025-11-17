@@ -1,12 +1,26 @@
 import { theme } from "@/constants/theme"
 import { useThemeColor } from "@/hooks/UseThemeColor"
-import { ActivityIndicator, Pressable, StyleSheet, Text } from "react-native"
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  Text,
+  ViewStyle,
+} from "react-native"
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from "react-native-reanimated"
-import { ButtonProps } from "./platform-button.ios"
+
+export interface ButtonProps {
+  title: string
+  onPress?: () => void
+  disabled?: boolean
+  variant?: "primary" | "secondary"
+  style?: StyleProp<ViewStyle>
+}
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable)
 

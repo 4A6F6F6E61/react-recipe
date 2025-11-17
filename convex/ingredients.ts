@@ -11,7 +11,7 @@ export const createIngredient = mutation({
     carbs: v.number(),
     fat: v.number(),
     fiber: v.number(),
-    image: v.optional(v.string()),
+    storageId: v.id("_storage"),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx)
@@ -19,6 +19,7 @@ export const createIngredient = mutation({
 
     const ingredientId = await ctx.db.insert("ingredients", {
       ...args,
+      image: args.storageId,
       createdBy: userId,
       createdAt: Date.now(),
     })
@@ -31,9 +32,22 @@ export const listIngredients = query({
   handler: async ctx => {
     const userId = await getAuthUserId(ctx)
     if (!userId) throw new Error("Not authenticated")
-    return await ctx.db
+    const ingredients = await ctx.db
       .query("ingredients")
       .withIndex("by_user", q => q.eq("createdBy", userId))
       .collect()
+
+    return Promise.all(
+      ingredients.map(async ingredient => ({
+        ...ingredient,
+        imageUrl: await ctx.storage.getUrl(ingredient.image),
+      })),
+    )
+  },
+})
+
+export const generateUploadUrl = mutation({
+  handler: async ctx => {
+    return await ctx.storage.generateUploadUrl()
   },
 })

@@ -3,7 +3,7 @@ import { theme } from "@/constants/theme"
 import { api } from "@/convex/_generated/api"
 import { useThemeColor } from "@/hooks/UseThemeColor"
 import { useQuery } from "convex/react"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import {
   ActivityIndicator,
   FlatList,
@@ -20,6 +20,10 @@ const IngredientsScreen = () => {
   const secondaryText = useThemeColor(theme.color.textSecondary)
 
   const data = useMemo(() => ingredients ?? [], [ingredients])
+
+  useEffect(() => {
+    console.log("Ingredients data:", data)
+  }, [data])
 
   if (ingredients === undefined) {
     return (
