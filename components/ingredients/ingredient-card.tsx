@@ -12,7 +12,7 @@ const MACRO_COLORS = {
 } as const
 
 type IngredientDoc = Doc<"ingredients"> & {
-  imageUrl: string
+  imageUrl: string | null
 }
 
 interface IngredientCardProps {
@@ -67,7 +67,7 @@ const IngredientCard = memo(({ ingredient }: IngredientCardProps) => {
     <View style={[styles.wrapper, styles.shadow]}>
       <View style={[styles.card, { backgroundColor, borderColor }]}>
         <Image
-          source={{ uri: ingredient.imageUrl }}
+          source={{ uri: ingredient.imageUrl ?? undefined }}
           style={styles.image}
           resizeMode="cover"
         />

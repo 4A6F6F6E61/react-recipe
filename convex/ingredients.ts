@@ -18,7 +18,12 @@ export const createIngredient = mutation({
     if (!userId) throw new Error("Not authenticated")
 
     const ingredientId = await ctx.db.insert("ingredients", {
-      ...args,
+      name: args.name,
+      calories: args.calories,
+      protein: args.protein,
+      carbs: args.carbs,
+      fat: args.fat,
+      fiber: args.fiber,
       image: args.storageId,
       createdBy: userId,
       createdAt: Date.now(),
